@@ -36,14 +36,3 @@ export const tileDetails = {
   }
 };
 
-export const contactFormSubmissions = [];
-
-export const submitContactForm = (formData) => {
-  const submission = {
-    ...formData,
-    timestamp: new Date().toISOString(),
-    id: Date.now()
-  };
-  contactFormSubmissions.push(submission);
-  return submission;
-};
