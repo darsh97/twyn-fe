@@ -4,9 +4,9 @@ import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { submitContactForm } from '../mock';
 import { toast } from 'sonner';
 import { CheckCircle2 } from 'lucide-react';
+import axios from 'axios';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -23,27 +23,40 @@ const Contact = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Mock submission
-    submitContactForm(formData);
-    
-    setIsSubmitted(true);
-    toast.success('Thank you! We\'ll be in touch soon.');
-    
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setFormData({
-        name: '',
-        email: '',
-        company: '',
-        useCase: '',
-        message: ''
-      });
-      setIsSubmitted(false);
-    }, 3000);
+    try {
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        company: formData.company,
+        use_case: formData.useCase,
+        message: formData.message
+      };
+      
+      await axios.post('https://twyn-be.vercel.app/api/v1/contacts', payload);
+      
+      setIsSubmitted(true);
+      toast.success('Thank you! We\'ll be in touch soon.');
+      
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setFormData({
+          name: '',
+          email: '',
+          company: '',
+          useCase: '',
+          message: ''
+        });
+        setIsSubmitted(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
+      toast.error('Something went wrong. Please try again later.', error);
+    }
   };
+
 
   return (
     <div className="contact-page">
@@ -82,7 +95,7 @@ const Contact = () => {
           </div>
         </div>
 
-        <div className="contact-form-container">
+        <div className="contact-form-container">  
           {isSubmitted ? (
             <div className="success-message">
               <CheckCircle2 size={64} className="success-icon" />
